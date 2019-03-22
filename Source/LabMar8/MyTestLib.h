@@ -16,4 +16,7 @@ class LABMAR8_API UMyTestLib : public UBlueprintFunctionLibrary
 	
 	UFUNCTION(BlueprintPure)
 	static FVector Slerp(FVector start, FVector end, float alpha);
+
+	UFUNCTION(BlueprintPure)
+	static FVector RotateAroundTarget(FVector target, FVector axis, float angle, float radius, float speed);
 };
