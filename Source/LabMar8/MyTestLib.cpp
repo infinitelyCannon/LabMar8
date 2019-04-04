@@ -1,10 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyTestLib.h"
+#include <cmath>
 
-FVector UMyTestLib::RotateAroundTarget(FVector target, FVector axis, float angle, float radius, float speed)
+FVector UMyTestLib::RotateAroundTarget(FVector target, FVector axis, float angle, float radius, float speed, FVector directionalOffset, float radialOffset)
 {
-	FVector dimensions = FVector(radius, 0.0f, 0.0f);
+	//float multiplier = std::exp(angle * speed * 0.1f) * 0.152f; //std::fmod(angle * speed, 360.0f) * 0.4222f;
+	float rVelocity = radialOffset * angle;
+	FVector dimensions = FVector(radius + rVelocity, 0.0f, 0.0f);
 	//float theta = angle;
 	//theta = FMath::Clamp<float>(theta, 0.0f, 360.f);
 	FVector axisVector = axis;
@@ -39,5 +42,5 @@ FVector UMyTestLib::Slerp(FVector start, FVector end, FVector axis, float speed,
 	FVector midPoint = (start + end) * 0.5f;
 
 
-	return RotateAroundTarget(midPoint, axis, angle, distance, speed);
+	return FVector(0, 0, 0);//RotateAroundTarget(midPoint, axis, angle, distance, speed);
 }
