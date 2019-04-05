@@ -1,25 +1,42 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyTestLib.h"
-#include <cmath>
 
-FVector UMyTestLib::RotateAroundTarget(FVector target, FVector axis, float angle, float radius, float speed, float perpendicularOffset, float radialOffset, bool clampSpiral)
+FVector UMyTestLib::RotateAroundTarget(
+	FVector target,
+	FVector axis,
+	float time,
+	float radius,
+	float speed,
+	float perpendicularOffset,
+	float radialOffset,
+	float minRadius,
+	float maxRadius,
+	bool clampMovement)
 {
-	//float multiplier = std::exp(angle * speed * 0.1f) * 0.152f; //std::fmod(angle * speed, 360.0f) * 0.4222f;
-	float rVelocity = radialOffset * angle;
+	float rVelocity = radialOffset * time;
 	FVector dVelocity = axis;
 	dVelocity.Normalize();
-	dVelocity = dVelocity * perpendicularOffset * angle;
-	FVector dimensions = FVector(clampSpiral ? FMath::Clamp(radius + rVelocity, 0.0f, radius) : (radius + rVelocity), 0.0f, 0.0f);
-	//float theta = angle;
-	//theta = FMath::Clamp<float>(theta, 0.0f, 360.f);
+
+	if (((radius + rVelocity) <= minRadius || (radius + rVelocity) >= maxRadius) && clampMovement)
+		dVelocity = dVelocity * perpendicularOffset * getTravelTime(radius, radialOffset, (radialOffset < 0.0f ? minRadius : maxRadius));
+	else
+		dVelocity = dVelocity * perpendicularOffset * time;
+
+	FVector dimensions = FVector(clampMovement ? FMath::Clamp(radius + rVelocity, minRadius, maxRadius) : (radius + rVelocity), 0.0f, 0.0f);
+
 	FVector axisVector = axis;
 	if (axisVector.Size() != 1.0f)
 		axisVector.Normalize();
 
-	FVector RotatedVec = dimensions.RotateAngleAxis(angle * speed, axisVector);
+	FVector RotatedVec = dimensions.RotateAngleAxis(time * speed, axisVector);
 
 	return target + RotatedVec + dVelocity;
+}
+
+float UMyTestLib::getTravelTime(float initial, float velocity, float destination)
+{
+	return FMath::Abs((destination - initial) / velocity);
 }
 
 FVector UMyTestLib::Slerp(FVector start, FVector end, FVector axis, float speed, float alpha)
