@@ -2,9 +2,10 @@
 
 #include "MyTestLib.h"
 
-FVector UMyTestLib::RotateAroundTarget(
+FVector UMyTestLib::Slerp(
 	FVector target,
 	FVector axis,
+	float initialAngle,
 	float time,
 	float radius,
 	float speed,
@@ -12,9 +13,11 @@ FVector UMyTestLib::RotateAroundTarget(
 	float radialOffset,
 	float minRadius,
 	float maxRadius,
-	bool clampMovement)
+	bool clampMovement,
+	float &angle)
 {
 	float rVelocity = radialOffset * time;
+	float startAngle = FMath::Fmod(initialAngle, 360.0f);
 	FVector dVelocity = axis;
 	dVelocity.Normalize();
 
@@ -23,13 +26,14 @@ FVector UMyTestLib::RotateAroundTarget(
 	else
 		dVelocity = dVelocity * perpendicularOffset * time;
 
-	FVector dimensions = FVector(clampMovement ? FMath::Clamp(radius + rVelocity, minRadius, maxRadius) : (radius + rVelocity), 0.0f, 0.0f);
+	FVector dimensions = FVector(0.0f, clampMovement ? FMath::Clamp(radius + rVelocity, minRadius, maxRadius) : (radius + rVelocity), 0.0f).RotateAngleAxis(startAngle, axis);
 
 	FVector axisVector = axis;
 	if (axisVector.Size() != 1.0f)
 		axisVector.Normalize();
 
 	FVector RotatedVec = dimensions.RotateAngleAxis(time * speed, axisVector);
+	angle = FMath::Fmod(speed * time, 360.0f);
 
 	return target + RotatedVec + dVelocity;
 }
@@ -37,30 +41,4 @@ FVector UMyTestLib::RotateAroundTarget(
 float UMyTestLib::getTravelTime(float initial, float velocity, float destination)
 {
 	return FMath::Abs((destination - initial) / velocity);
-}
-
-FVector UMyTestLib::Slerp(FVector start, FVector end, FVector axis, float speed, float alpha)
-{
-	/*
-	a: 0
-	b: 1
-	c: 0
-	d: 180
-	float dot = FVector::DotProduct(start, end);
-
-	dot = FMath::Clamp<float>(dot, -1.0f, 1.0f);
-
-	float theta = FMath::Acos(dot) * alpha;
-	FVector relativeVec = end - start * dot;
-	relativeVec.Normalize(1.0f);
-
-	return ((start * FMath::Cos(theta)) + (relativeVec * FMath::Sin(theta)));
-	*/
-	//y = (x - a) * ((d - c) / (b - a)) + c
-	float angle = alpha * 180.0f;
-	float distance = FVector::Dist(start, end) * 0.5f;
-	FVector midPoint = (start + end) * 0.5f;
-
-
-	return FVector(0, 0, 0);//RotateAroundTarget(midPoint, axis, angle, distance, speed);
 }

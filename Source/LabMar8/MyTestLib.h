@@ -15,14 +15,12 @@ class LABMAR8_API UMyTestLib : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 	static float getTravelTime(float initial, float velocity, float destination);
-	
-	UFUNCTION(BlueprintPure)
-	static FVector Slerp(FVector start, FVector end, FVector axis, float speed, float alpha);
 
 	UFUNCTION(BlueprintPure)
-	static FVector RotateAroundTarget(
+	static FVector Slerp(
 		FVector target,
 		FVector axis,
+		float initialAngle,
 		float time,
 		float radius,
 		float speed,
@@ -30,5 +28,6 @@ class LABMAR8_API UMyTestLib : public UBlueprintFunctionLibrary
 		float radialOffset,
 		float minRadius,
 		float maxRadius,
-		bool clampMovement);
+		bool clampMovement,
+		float &angle);
 };
